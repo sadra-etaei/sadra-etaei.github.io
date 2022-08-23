@@ -1,0 +1,43 @@
+[
+    {
+        "name" : "html" , 
+        "pro" :    95 
+    } ,
+    {
+        "name" : "css" , 
+        "pro" :    90 
+    } ,
+    {
+        "name" : "javascript" , 
+        "pro" :    85 
+    } ,
+    {
+        "name" : "bootstrap" , 
+        "pro" :    95 
+    } ,
+    {
+        "name" : "react js" , 
+        "pro" :    85 
+    } ,
+    {
+        "name" : "python" , 
+        "pro" :    75 
+    } ,
+    {
+        "name" : "django" , 
+        "pro" :    70 
+    } ,
+    {
+        "name" : "sqlite" , 
+        "pro" :    75 
+    } ,
+    {
+        "name" : "git" , 
+        "pro" :    95 
+    } ,
+    {
+        "name" : "tkinter" , 
+        "pro" :    95 
+    } 
+
+]
