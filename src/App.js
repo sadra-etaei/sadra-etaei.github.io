@@ -17,7 +17,7 @@ function App() {
   const [skills, setSkills] = React.useState([])
   const [projects, setProjects] = React.useState([])
   const [mode, setMode] = React.useState("light mode")
-  const [lan, setLan] = React.useState("english")
+  const [lan, setLan] = React.useState("en")
   function get() {
     my_skills.map(s => setSkills(prev => [...prev, <Skill name={s.name} proficiency={s.pro} />]))
     data.map(pro => setProjects(prev => [...prev, <Project name={pro.name} src={pro.src} />]))
@@ -31,8 +31,8 @@ function App() {
   React.useEffect(get, [])
   const style1 = {
     color: mode === "light mode" ? "black" : "white",
-    backgroundColor: mode === "light mode" ? "white" : "rgb(5, 33, 45)  " ,
-    display : lan === "en" ? "flex" : "none"
+    backgroundColor: mode === "light mode" ? "white" : "rgb(5, 33, 45)  ",
+    display: lan === "en" ? "flex" : "none"
   }
   const style2 = {
     color: mode === "light mode" ? "black" : "white",
@@ -40,13 +40,13 @@ function App() {
   }
   const style3 = {
     color: mode === "light mode" ? "black" : "white",
-    backgroundColor: mode === "light mode" ? "white" : "rgb(13, 6, 55)" ,
-    display : lan === "en" ? "none" : "flex"
+    backgroundColor: mode === "light mode" ? "white" : "rgb(13, 6, 55)",
+    display: lan === "en" ? "none" : "flex"
   }
   const style4 = {
-    direction : lan === "en" ? "ltr" : "rtl" , 
-    flexDirection: lan === "en" ? "row" : "row-reverse" , 
-    marginLeft : lan === "en" ? "100px" : "10px"
+    direction: lan === "en" ? "ltr" : "rtl",
+    flexDirection: lan === "en" ? "row" : "row-reverse",
+    marginLeft: lan === "en" ? "100px" : "10px"
   }
   return (
     <main>
@@ -70,7 +70,7 @@ function App() {
           </div>
         </div>
         <div id='about' className='about'>
-          <div   className='info'>
+          <div className='info'>
             <h1 >About Me </h1>
             <p> I am a 16 year old iranian  web developer , AI inthusiast , photographer and translator based in Urmia / Iran
               I first started programming when I was 13 and I`ve been a web developer for a year now ,
@@ -102,7 +102,7 @@ function App() {
                 <div className='color-2'></div>
               </div>
             </div>
-            <div  className='lan-2'>
+            <div className='lan-2'>
               <div className='per'>
                 <h2>Persian :</h2>
                 <h3>100%</h3>
@@ -135,7 +135,7 @@ function App() {
               <p>etaeisadra@gmail.com</p>
             </div>
             <div className='social'>
-              <a><img src={phone} alt="" /></a>
+              <a href='a'><img src={phone} alt="" /></a>
               <p>09021708686</p>
             </div>
             <div className='social'>
@@ -156,7 +156,7 @@ function App() {
       <div lang="fa-IR" className="fa" style={style3} >
         <div className='first-sec'>
           <div className='up-sec'>
-          <input onClick={changeLan} type={"button"} value={lan} />
+            <input onClick={changeLan} type={"button"} value={lan} />
             <div id='fa-nav' className='navbar'>
               <a href='#about2'>درباره من</a>
               <a href='#skills2'>مهارت ها</a>
@@ -231,20 +231,20 @@ function App() {
           <h1>ارتباط با من</h1>
           <p>یرای ارتباط با من می توانید به صورت حضوری ویا از طریق فضای مجازی اقدام کنید</p>
           <div className='contact-box'>
-            <div className='social'>
-              <img src={gmail} alt="" />
+          <div className='social'>
+              <a href='https://mail.google.com/'><img src={gmail} alt="" /></a>
               <p>etaeisadra@gmail.com</p>
             </div>
             <div className='social'>
-              <img src={phone} alt="" />
+              <a href='a'><img src={phone} alt="" /></a>
               <p>09021708686</p>
             </div>
             <div className='social'>
-              <img src={insta} alt="" />
+              <a href='https://www.instagram.com/sadra.etaei/'><img src={insta} alt="" /></a>
               <p>sadra.etaei</p>
             </div>
             <div className='social'>
-              <img src={twitter} alt="" />
+              <a href='https://twitter.com/EtaeiSadra'><img src={twitter} alt="" /></a>
               <p>EtaeiSadra</p>
             </div>
           </div>
