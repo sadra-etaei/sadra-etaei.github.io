@@ -17,7 +17,7 @@ function App() {
   const [skills, setSkills] = React.useState([])
   const [projects, setProjects] = React.useState([])
   const [mode, setMode] = React.useState("light mode")
-  const [lan, setLan] = React.useState("en")
+  const [lan, setLan] = React.useState("english")
   function get() {
     my_skills.map(s => setSkills(prev => [...prev, <Skill name={s.name} proficiency={s.pro} />]))
     data.map(pro => setProjects(prev => [...prev, <Project name={pro.name} src={pro.src} />]))
@@ -131,19 +131,19 @@ function App() {
           <p>you can either  contact me through social media or in person </p>
           <div className='contact-box'>
             <div className='social'>
-              <img src={gmail} alt="" />
+              <a href='https://mail.google.com/'><img src={gmail} alt="" /></a>
               <p>etaeisadra@gmail.com</p>
             </div>
             <div className='social'>
-              <img src={phone} alt="" />
+              <a><img src={phone} alt="" /></a>
               <p>09021708686</p>
             </div>
             <div className='social'>
-              <img src={insta} alt="" />
+              <a href='https://www.instagram.com/sadra.etaei/'><img src={insta} alt="" /></a>
               <p>sadra.etaei</p>
             </div>
             <div className='social'>
-              <img src={twitter} alt="" />
+              <a href='https://twitter.com/EtaeiSadra'><img src={twitter} alt="" /></a>
               <p>EtaeiSadra</p>
             </div>
           </div>

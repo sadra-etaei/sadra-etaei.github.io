@@ -33,7 +33,7 @@ body {
   cursor: pointer;
   margin-left: 200px;
   margin-right: 200px;
-  padding-top: 45px;
+  padding-top: 50px;
   border: none;
   background: inherit;
   color: white;
@@ -370,7 +370,7 @@ p {
 
 @media screen and (max-width : 700px) {
   .first-sec {
-    width: 100vw;
+    width: 105vw;
     align-items: center;
     /* justify-content: center; */
     margin-left: 0px;
@@ -381,6 +381,7 @@ p {
     align-items: center;
     justify-content: center;
     margin-right: 8vw;
+    padding-right: 4px;
   }
   #en-nav{
     margin-right: 30vw;
@@ -390,13 +391,15 @@ p {
     padding-left: 20px;
     font-size: 10px;
   }
-
+  #lan{
+    font-size: 13px;
+  }
   .up-sec input {
-    /* padding-top: 50px;
+    padding-top: 52px;
     margin-left:-150px;
-    margin-right: -180px;
-    font-size: 10px */
-    display: none
+    margin-right: -155px;
+    font-size: 10px ;
+    display: flex
   }
 
   .intro {
