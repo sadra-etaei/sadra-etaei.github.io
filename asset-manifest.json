@@ -1,0 +1,23 @@
+{
+  "files": {
+    "main.css": "/static/css/main.46f6dca3.css",
+    "main.js": "/static/js/main.47c95207.js",
+    "static/js/787.bbe01249.chunk.js": "/static/js/787.bbe01249.chunk.js",
+    "static/media/wallhaven-q6k7yd.jpg": "/static/media/wallhaven-q6k7yd.01a3372a3faa7a1eb9ba.jpg",
+    "static/media/mike-l-8Qr1ixi-rMU-unsplash.jpg": "/static/media/mike-l-8Qr1ixi-rMU-unsplash.0c9f83da2b3e6f6aa6d1.jpg",
+    "static/media/Web capture_13-8-2022_22741_localhost.jpeg": "/static/media/Web capture_13-8-2022_22741_localhost.2a3fefa9b74191041904.jpeg",
+    "static/media/Web capture_13-8-2022_22753_localhost.jpeg": "/static/media/Web capture_13-8-2022_22753_localhost.bc8f5545590e14eba159.jpeg",
+    "static/media/instagram.png": "/static/media/instagram.e719d8b29f452a16302d.png",
+    "static/media/IMG_1522.jpeg": "/static/media/IMG_1522.978f570c90bc7ca5a1ac.jpeg",
+    "static/media/twitter.png": "/static/media/twitter.894988327f8d68209e91.png",
+    "static/media/apple.png": "/static/media/apple.5e140fc5748e50fe8465.png",
+    "index.html": "/index.html",
+    "main.46f6dca3.css.map": "/static/css/main.46f6dca3.css.map",
+    "main.47c95207.js.map": "/static/js/main.47c95207.js.map",
+    "787.bbe01249.chunk.js.map": "/static/js/787.bbe01249.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.46f6dca3.css",
+    "static/js/main.47c95207.js"
+  ]
+}
