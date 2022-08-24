@@ -16,31 +16,31 @@ import twitter from "./images/twitter.png"
 function App() {
   const [skills, setSkills] = React.useState([])
   const [projects, setProjects] = React.useState([])
-  const [mode, setMode] = React.useState("light mode")
+  const [mode, setMode] = React.useState("light")
   const [lan, setLan] = React.useState("en")
   function get() {
     my_skills.map(s => setSkills(prev => [...prev, <Skill name={s.name} proficiency={s.pro} />]))
     data.map(pro => setProjects(prev => [...prev, <Project name={pro.name} src={pro.src} />]))
   }
   function changeMode() {
-    setMode(prevMode => prevMode === "light mode" ? "dark mode" : "light mode")
+    setMode(prevMode => prevMode === "light" ? "dark" : "light")
   }
   function changeLan() {
     setLan(prevMode => prevMode === "en" ? "fa" : "en")
   }
   React.useEffect(get, [])
   const style1 = {
-    color: mode === "light mode" ? "black" : "white",
-    backgroundColor: mode === "light mode" ? "white" : "rgb(5, 33, 45)  ",
+    color: mode === "light" ? "black" : "white",
+    backgroundColor: mode === "light" ? "white" : "rgb(5, 33, 45)  ",
     display: lan === "en" ? "flex" : "none"
   }
   const style2 = {
-    color: mode === "light mode" ? "black" : "white",
+    color: mode === "light" ? "black" : "white",
     // backgroundColor: mode === "light mode" ? "rgb(13, 6, 55)" : "white"
   }
   const style3 = {
-    color: mode === "light mode" ? "black" : "white",
-    backgroundColor: mode === "light mode" ? "white" : "rgb(13, 6, 55)",
+    color: mode === "light" ? "black" : "white",
+    backgroundColor: mode === "light" ? "white" : "rgb(13, 6, 55)",
     display: lan === "en" ? "none" : "flex"
   }
   const style4 = {
@@ -52,16 +52,19 @@ function App() {
     <main>
       <div className='en' style={style1} >
         <div className='first-sec'>
-          <div className='up-sec'>
-            <input id='lan' onClick={changeLan} type={"button"} value={lan} />
-            <div id='en-nav' style={style4} className='navbar'>
+          <div id='en-nav' style={style4} className='navbar'>
+            <input className='lan' onClick={changeLan} type={"button"} value={lan} />
+
+            <div className='anchors'>
               <a href='#about'>About</a>
               <a href='#skills'>Skills</a>
               <a href='#projects'>Projects</a>
               <a href='#articles'>Articles</a>
               <a href='#contact'>Contact</a>
             </div>
-            <input onClick={changeMode} type={"button"} value={mode} />
+
+            <input className='mode' onClick={changeMode} type={"button"} value={mode} />
+
           </div>
           <div className='intro'>
             <h1>Sadra Etaei</h1>
@@ -156,15 +159,17 @@ function App() {
       <div lang="fa-IR" className="fa" style={style3} >
         <div className='first-sec'>
           <div className='up-sec'>
-            <input onClick={changeLan} type={"button"} value={lan} />
             <div id='fa-nav' className='navbar'>
-              <a href='#about2'>درباره من</a>
-              <a href='#skills2'>مهارت ها</a>
-              <a href='#projects2'>پروژه ها</a>
-              <a href='#articles2'>مقالات</a>
-              <a href='#contact2'>ارتباط با من</a>
+              <input className='lan' onClick={changeLan} type={"button"} value={lan} />
+              <div className='anchors'>
+                <a href='#about2'>درباره من</a>
+                <a href='#skills2'>مهارت ها</a>
+                <a href='#projects2'>پروژه ها</a>
+                <a href='#articles2'>مقالات</a>
+                <a href='#contact2'>ارتباط با من</a>
+              </div>
+              <input className='mode' onClick={changeMode} type={"button"} value={mode} />
             </div>
-            <input onClick={changeMode} type={"button"} value={mode} />
           </div>
           <div className='intro'>
             <h1>صدرا اعطایی </h1>
@@ -231,7 +236,7 @@ function App() {
           <h1>ارتباط با من</h1>
           <p>یرای ارتباط با من می توانید به صورت حضوری ویا از طریق فضای مجازی اقدام کنید</p>
           <div className='contact-box'>
-          <div className='social'>
+            <div className='social'>
               <a href='https://mail.google.com/'><img src={gmail} alt="" /></a>
               <p>etaeisadra@gmail.com</p>
             </div>

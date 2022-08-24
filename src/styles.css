@@ -1,7 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital@1&display=swap');
-title{
+
+title {
   display: none;
 }
+
 body {
   overflow-y: scroll;
   font-family: 'Poppins', sans-serif;
@@ -22,18 +24,23 @@ body {
   /* direction: rtl; */
 }
 
-.up-sec {
-  display: inline-flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
+.mode {
+  margin-left: 150px;
+
 }
 
-.up-sec input {
+.lan {
+  margin-left: 100px;
+}
+
+.anchors {
+  margin-left: 260px;
+}
+
+.navbar input {
   cursor: pointer;
-  margin-left: 200px;
-  margin-right: 200px;
-  padding-top: 50px;
+  margin-right: 20px;
+  padding-left: 50px;
   border: none;
   background: inherit;
   color: white;
@@ -54,10 +61,10 @@ body {
 
 .navbar {
   display: flex;
-  padding-top: 50px;
-  width: 52vw;
+  padding-top: 70px;
+  width: 100vw;
   align-items: center;
-  flex-direction: row-reverse;
+  flex-direction: row
 }
 
 .navbar a {
@@ -383,7 +390,8 @@ p {
     margin-right: 8vw;
     padding-right: 4px;
   }
-  #en-nav{
+
+  #en-nav {
     margin-right: 30vw;
   }
 
@@ -391,15 +399,20 @@ p {
     padding-left: 20px;
     font-size: 10px;
   }
-  #lan{
+
+  #lan {
     font-size: 13px;
   }
-  .up-sec input {
-    padding-top: 52px;
-    margin-left:-150px;
-    margin-right: -155px;
-    font-size: 10px ;
-    display: flex
+
+  .anchors {
+    margin-left:10PX;
+  }
+
+  .navbar input {
+    padding-top: 6PX;
+    margin-left: -30px;
+    margin-right: -10px;
+    font-size: 10px;
   }
 
   .intro {
@@ -479,4 +492,7 @@ p {
     flex-direction: column;
   }
 
+  #fa-nav {
+    margin-right: -16px;
+  }
 }
