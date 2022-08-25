@@ -22,6 +22,8 @@ body {
   display: flex;
   flex-direction: column;
   /* direction: rtl; */
+  font-family: 'Poppins', sans-serif;
+
 }
 
 .mode {
@@ -493,6 +495,6 @@ p {
   }
 
   #fa-nav {
-    margin-right: -16px;
+    margin-right: 10px;
   }
 }
