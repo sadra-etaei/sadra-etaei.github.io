@@ -188,10 +188,10 @@ function App() {
           <h1>مهارت ها</h1>
           <div style={style2} className='box'>
             <div className='first-col'>
-              {skills.slice(0, 4)}
+              {skills.slice(0, 5)}
             </div>
             <div className='sec-col'>
-              {skills.slice(4, 8)}
+              {skills.slice(5, 10)}
             </div>
           </div>
         </div>
