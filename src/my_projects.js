@@ -1,23 +1,23 @@
- import img1 from "./images/Web capture_13-8-2022_22741_localhost.jpeg"
- import img2 from "./images/Web capture_13-8-2022_22753_localhost.jpeg"
- import img3 from "./images/wallhaven-q6k7yd.jpg"
- import img4 from "./images/mike-l-8Qr1ixi-rMU-unsplash.jpg"
+ import img1 from "./images/Web capture_4-3-2023_72834_.jpeg"
+ import img2 from "./images/Web capture_4-3-2023_71333_.jpeg"
+ import img3 from "./images/Web capture_4-3-2023_72659_127.0.0.1.jpeg"
+ import img4 from "./images/Web capture_4-3-2023_71548_.jpeg"
  const data = [
     {
         src : img1 , 
-        name : "clock app"
+        name : "loop studios landing page"
     } ,
     {
         src : img2 , 
-        name : "countries app"
+        name : "ecommerce page"
     } ,
     {
         src : img3, 
-        name : "personal website"
+        name : "xlog"
     } ,
     {
         src : img4 , 
-        name : "forest"
+        name : "space tourism landing page"
     } 
 ]
 export default data

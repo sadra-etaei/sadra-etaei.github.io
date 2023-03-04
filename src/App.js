@@ -75,9 +75,9 @@ function App() {
         <div id='about' className='about'>
           <div className='info'>
             <h1 >About Me </h1>
-            <p> I am a 16 year old iranian  web developer , AI inthusiast , photographer and translator based in Urmia / Iran
+            <p> I am a 16 year old iranian  web developer and proffesional tennis player  based in Urmia / Iran
               I first started programming when I was 13 and I`ve been a web developer for a year now ,
-              I`m also fluent in english and persian .</p>
+              I`m also fluent in english , turkish and german .</p>
           </div>
           <img id='personal' src={img1} alt="" />
         </div>
@@ -98,7 +98,7 @@ function App() {
             <div className='lan'>
               <div className='per'>
                 <h2>English :</h2>
-                <h3>90%</h3>
+                <h3>100%</h3>
               </div>
 
               <div className='bar-1'>
@@ -107,13 +107,24 @@ function App() {
             </div>
             <div className='lan-2'>
               <div className='per'>
-                <h2>Persian :</h2>
-                <h3>100%</h3>
+                <h2>German :</h2>
+                <h3>60%</h3>
               </div>
               <div className='bar-1'>
                 <div className='color-1'></div>
               </div>
             </div>
+
+            <div className='lan-3'>
+              <div className='per'>
+                <h2>Turkish :</h2>
+                <h3>80%</h3>
+              </div>
+              <div className='bar-1'>
+                <div className='color-1'></div>
+              </div>
+            </div>
+
           </div>
         </div>
         <div id='projects' className='projects'>
@@ -153,7 +164,7 @@ function App() {
         </div>
         <div className='footer'>
           {/* <h1>Sadra Etaei</h1> */}
-          <p>© 2022 Sadra Etaei</p>
+          <p>© 2023 Sadra Etaei</p>
         </div>
       </div >
       <div lang="fa-IR" className="fa" style={style3} >
@@ -180,7 +191,7 @@ function App() {
         <div id='about2' className='about'>
           <div className='info'>
             <h1>درباره من </h1>
-            <p>  من صدرا اعطایی برنامه نویس , توسعه دهنده وب , عکاس و مترجم متولد 1385 هستم و چند سالی هست که کد نویسی می کنم و الان یک سال هست که به صورت نخصصی برنامه نویس وب می کنم</p>
+            <p>  من صدرا اعطایی برنامه نویس , توسعه دهنده وب , تنیسر متولد 1385 هستم و چند سالی هست که برنامه نویسی می کنم و الان یک سال هست که به صورت نخصصی برنامه نویس وب می کنم</p>
           </div>
           <img id='personal' src={img1} alt="" />
         </div>
@@ -201,7 +212,7 @@ function App() {
             <div className='lan'>
               <div className='per'>
                 <h2  >انگلیسی   :   </h2>
-                <h3>90%</h3>
+                <h3>100%</h3>
               </div>
 
               <div className='bar-1'>
@@ -210,13 +221,23 @@ function App() {
             </div>
             <div className='lan-2'>
               <div className='per'>
-                <h2>فارسی     :</h2>
-                <h3>100%</h3>
+                <h2>المانی  :</h2>
+                <h3>60%</h3>
               </div>
               <div className='bar-1'>
                 <div className='color-1'></div>
               </div>
             </div>
+
+            <div className='lan-3'>
+              <div className='per'>
+                <h2>ترکی  :</h2>
+                <h3>80%</h3>
+              </div>
+              <div className='bar-1'>
+                <div className='color-1'></div>
+              </div>
+            </div> 
           </div>
         </div>
         <div id='projects2' className='projects'>
@@ -255,7 +276,7 @@ function App() {
           </div>
         </div>
         <div className='footer'>
-          <p>© 2022 Sadra Etaei</p>
+          <p>© 2023 Sadra Etaei</p>
         </div>
       </div >
     </main >
