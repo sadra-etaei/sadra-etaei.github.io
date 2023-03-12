@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.css": "/static/css/main.ccd2a475.css",
+    "main.css": "/static/css/main.1d8c011c.css",
     "main.js": "/static/js/main.0956bcb3.js",
     "static/js/787.1c15bed0.chunk.js": "/static/js/787.1c15bed0.chunk.js",
     "static/media/wallhaven-q6k7yd.jpg": "/static/media/wallhaven-q6k7yd.01a3372a3faa7a1eb9ba.jpg",
@@ -13,12 +13,12 @@
     "static/media/twitter.png": "/static/media/twitter.894988327f8d68209e91.png",
     "static/media/apple.png": "/static/media/apple.5e140fc5748e50fe8465.png",
     "index.html": "/index.html",
-    "main.ccd2a475.css.map": "/static/css/main.ccd2a475.css.map",
+    "main.1d8c011c.css.map": "/static/css/main.1d8c011c.css.map",
     "main.0956bcb3.js.map": "/static/js/main.0956bcb3.js.map",
     "787.1c15bed0.chunk.js.map": "/static/js/787.1c15bed0.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.ccd2a475.css",
+    "static/css/main.1d8c011c.css",
     "static/js/main.0956bcb3.js"
   ]
 }
