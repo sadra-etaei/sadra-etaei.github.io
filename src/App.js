@@ -75,12 +75,9 @@ function App() {
         <div id='about' className='about'>
           <div className='info'>
             <h1 >About Me </h1>
-            <p> I am a 16 year old iranian  web developer and proffesional tennis player  based in Urmia / Iran
+            <p> I am a 18 year old iranian  web developer and proffesional tennis player  based in Urmia / Iran
               I first started programming when I was 13 and I`ve been a web developer for a year now ,
               I`m also fluent in english , turkish and german .</p>
-          </div>
-          <img id='personal' src={img1} alt="" />
-        </div>
         <div id='skills' className='skills'>
           <h1>Skills</h1>
           <div style={style2} className='box'>
@@ -276,7 +273,7 @@ function App() {
           </div>
         </div>
         <div className='footer'>
-          <p>© 2023 Sadra Etaei</p>
+          <p>© 2024 Sadra Etaei</p>
         </div>
       </div >
     </main >
