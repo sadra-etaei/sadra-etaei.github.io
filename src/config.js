@@ -8,7 +8,7 @@ export const site = {
   // A couple of sentences about you, shown on the home page.
   intro: `I like math , nlp , RL and I like writing about the cool things I build`,
   // Longer bio for the About section on the home page.
-  about: `I'm an AI researcher with a focus on mathematics, natural language processing, and reinforcement learning. I like building models from first principles — transformers, language models, word embeddings — and writing about what I learn along the way.
+  about: `I'm an AI researcher, Electrical engineering student studying in Shiraz university  with a focus on mathematics, natural language processing, and reinforcement learning. I like building models from first principles  and writing about what I learn along the way.
 
 When I'm not coding, you'll find me reading papers, experimenting with new architectures, or turning a tricky idea into something that actually runs.`,
   // Place your resume at public/resume.pdf (or change the filename here).
