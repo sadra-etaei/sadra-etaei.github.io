@@ -17,7 +17,7 @@ When I'm not coding, you'll find me reading papers, experimenting with new archi
   links: [
     { label: 'GitHub', url: 'https://github.com/sadra-etaei' },
     { label: 'X', url: 'https://x.com/EtaeiSadra' },
-    { label: 'LinkedIn', url: 'https://linkedin.com/in/yourusername' },
+    { label: 'LinkedIn', url: 'https://www.linkedin.com/in/sadra-etaei-143862350/' },
   ],
 }
 
