@@ -19,6 +19,17 @@ in the order data flows through it, and explain not just *what* each line
 does but *why* it has to be that way. The full code is on
 [GitHub](https://github.com/sadra-etaei/mini-transformer).
 
+<figure style="margin:1.75rem 0">
+  <video controls loop muted playsinline preload="metadata" style="width:100%;height:auto;display:block;border-radius:10px;border:1px solid var(--border);background:#000">
+    <source src="/transformers_explained.mp4" type="video/mp4" />
+    Your browser doesn't support embedded video —
+    <a href="/transformers_explained.mp4">download the animation</a> instead.
+  </video>
+  <figcaption style="font-family:var(--font-sans);font-size:0.82rem;color:var(--text-faint);text-align:center;margin-top:0.6rem">
+    A short animated walkthrough of how a Transformer moves information — the visual companion to everything below.
+  </figcaption>
+</figure>
+
 **Roadmap:** the big picture → scaled dot-product attention → multi-head
 attention and every reshape → the feed-forward network → positional
 encodings → residuals and LayerNorm → encoder and decoder layers → masking →
