@@ -23,6 +23,14 @@ When I'm not coding, you'll find me reading papers, experimenting with new archi
 
 export const projects = [
   {
+    title: 'arithmetic-circuits',
+    description:
+      "reverse-engineered how Qwen2.5-0.5B adds two numbers — the attention heads that fetch digits, the MLPs that compute, and the model's most-significant-first carry",
+    url: 'https://github.com/sadra-etaei/arithmetic_circuits',
+    tags: ['Interpretability', 'LLMs'],
+    year: '2026',
+  },
+  {
     title: 'BERT',
     description:
       'a reimplementation of BERT',
