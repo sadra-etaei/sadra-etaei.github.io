@@ -6,11 +6,11 @@ export const site = {
   // Short one-liner shown under your name on the home page.
   tagline: 'AI researcher',
   // A couple of sentences about you, shown on the home page.
-  intro: `I like math , nlp , RL and I like writing about the cool things I build`,
+  intro: 'I like math , nlp , RL and I`m also interested in mechanistic interpretability and AI safety ',
   // Longer bio for the About section on the home page.
-  about: `I'm an AI researcher, Electrical engineering student studying in Shiraz university  with a focus on mathematics, natural language processing, and reinforcement learning. I like building models from first principles  and writing about what I learn along the way.
+  about: `I'm an Electrical engineering student studying in Shiraz university and an AI Researcher / Engineer  with a focus on  natural language processing, and reinforcement learning. I like building things from scratch  and writing about what I learn along the way.
 
-When I'm not coding, you'll find me reading papers, experimenting with new architectures, or turning a tricky idea into something that actually runs.`,
+I mostly like building intelligence and more than that I like seeing how that intelligence works `,
   // Place your resume at public/resume.pdf (or change the filename here).
   resumeFile: 'resume.pdf',
   email: 'etaeisadra@gmail.com',
@@ -22,14 +22,14 @@ When I'm not coding, you'll find me reading papers, experimenting with new archi
 }
 
 export const projects = [
-  {
-    title: 'arithmetic-circuits',
-    description:
-      "reverse-engineered how Qwen2.5-0.5B adds two numbers — the attention heads that fetch digits, the MLPs that compute, and the model's most-significant-first carry",
-    url: 'https://github.com/sadra-etaei/arithmetic_circuits',
-    tags: ['Interpretability', 'LLMs'],
-    year: '2026',
-  },
+  // {
+  //   title: 'arithmetic-circuits',
+  //   description:
+  //     "reverse-engineered how Qwen2.5-0.5B adds two numbers — the attention heads that fetch digits, the MLPs that compute, and the model's most-significant-first carry",
+  //   url: 'https://github.com/sadra-etaei/arithmetic_circuits',
+  //   tags: ['Interpretability', 'LLMs'],
+  //   year: '2026',
+  // },
   {
     title: 'BERT',
     description:
@@ -43,7 +43,7 @@ export const projects = [
     description:
       'a reimplementation of the image transformer paper , implemented 2D local Attention and a vision transformer',
     url: 'https://github.com/sadra-etaei/img-transformer',
-    tags: ['NLP', 'Image Generation'],
+    tags: ['NLP', 'Image Generation','ViT'],
     year: '2026',
   },
   {

@@ -14,7 +14,7 @@ paper glosses over — the masks, the tensor gymnastics, the numerics, the
 difference between a training loss that drops and a model that actually
 translates.
 
-This is the long version. I'm going to walk through nearly every component,
+I'm going to walk through nearly every component,
 in the order data flows through it, and explain not just *what* each line
 does but *why* it has to be that way. The full code is on
 [GitHub](https://github.com/sadra-etaei/mini-transformer).
@@ -50,7 +50,7 @@ The Transformer throws recurrence out entirely. Its central idea: let every
 token look directly at every other token in a single operation, and weight
 how much attention it pays to each. There's no distance penalty — the first
 and last word of a sentence are one step apart — and the whole sequence is
-processed in parallel.
+processed in parallel (which is why we use GPU`s).
 
 The architecture is an **encoder–decoder** pair. The encoder reads the
 English sentence and produces a stack of context-aware vectors, one per
@@ -86,7 +86,6 @@ Concretely, for one query vector:
 4. **Retrieve.** Multiply those weights by the value vectors and sum. Keys
    the query matched strongly contribute most.
 
-In code it's almost a direct transcription:
 
 ```python
 class ScaledDotProductAttn(nn.Module):
@@ -101,7 +100,7 @@ class ScaledDotProductAttn(nn.Module):
 
 ### Why divide by √dₖ?
 
-This is the "easy to skip, costly to omit" detail. Suppose the components of
+Suppose the components of
 $Q$ and $K$ are independent, each with mean 0 and variance 1. Their dot
 product is a sum of $d_k$ products; each product has variance 1, so the sum
 has **variance $d_k$** and standard deviation $\sqrt{d_k}$. With
@@ -111,22 +110,17 @@ Feed numbers that large into softmax and it saturates: one weight rounds to
 almost 1, the rest to almost 0. That's a problem because the gradient of
 softmax in its saturated region is nearly zero — the model can barely learn.
 Dividing by $\sqrt{d_k}$ rescales the variance back to 1, keeping the scores
-in the range where softmax is smooth and gradients flow. One division is the
-difference between a network that trains and one that stalls.
+in the range where softmax is smooth and gradients flow.
 
 ### The masking value
 
 Note `masked_fill(mask == 0, float('-inf'))`: we set masked positions to
 negative infinity *before* the softmax, so $e^{-\infty} = 0$ and those keys
-get exactly zero weight. It has to be `-inf` (or a very large negative like
-`-1e9`), not a small number — a gentle nudge like `-1e-9` would leave the
-forbidden positions almost fully visible, which is a genuinely nasty bug
-because the model still trains, just slightly wrong.
+get exactly zero weight
 
 ## Multi-head attention: einsum and every reshape, in detail
 
-This is the section I most wish someone had written for me. Multi-head
-attention isn't conceptually hard, but the *bookkeeping* — which axis is
+Multi-head attention isn't conceptually hard, but the *bookkeeping* — which axis is
 which, when to reshape, when memory is contiguous — is where nearly all my
 bugs lived. Let me go slowly through every shape.
 
@@ -162,11 +156,9 @@ class MultiHeadAttn(nn.Module):
         self.W_o = nn.Linear(d_model, d_model)
 ```
 
-The `assert` matters: if `d_model` isn't divisible by `n_heads`, the split
-doesn't tile evenly and you'll get a shape error three steps later that's
-much harder to trace back to its cause.
 
-### A quick primer on einsum
+
+###einsum
 
 `torch.einsum` (Einstein summation) lets you describe a tensor operation by
 *naming every axis with a letter* and writing what you want the output to
@@ -180,11 +172,9 @@ look like. The rule is delightfully simple:
 - Letters that survive to the output become its axes, in the order you
   write them.
 
-That's the entire mental model. `torch.matmul` forces you to remember that
+That's the entire mental model.with `torch.matmul` you have to remember that
 it batches over leading dimensions and contracts the last axis of the first
-tensor with the second-to-last of the other — rules you have to hold in your
-head. With einsum the rule is written *in the string*, right next to the
-operation, so the code is its own shape documentation.
+tensor with the second-to-last of the other , and I think it`s actually faster .
 
 ### Step 1 — projecting Q, K, V
 
@@ -222,11 +212,6 @@ the number that used to sit at position `h * d_k + d` in the old last axis.
 No copy happens, which is why this is fast — `view` only rewrites the
 tensor's *metadata* (its shape and strides), not its bytes.
 
-A subtle point: many tutorials immediately `.transpose(1, 2)` here to get
-`[Batch, Heads, Seq_Len, D_k]`, because they want the head axis next to the
-batch axis so `matmul` will treat `(batch, heads)` as batch dimensions. That
-transpose is exactly the fiddly, error-prone step I wanted to avoid — so I
-*don't* transpose, and let einsum handle the axis ordering instead.
 
 ### Step 3 — the scores: QKᵀ per head
 
@@ -249,10 +234,6 @@ Read the string carefully:
 - `q` and `k` each appear in only one input and both survive to the output,
   so they become the two axes of the resulting score matrix.
 
-Result: `[Batch, Heads, Q_Len, K_Len]`. To write this with `matmul` I'd have
-had to transpose `K`'s last two axes *and* have already moved the head axis
-forward. Here I just declared the shape I wanted. The `/ √d_k` is the same
-scaling derived above, keeping the softmax gradients healthy.
 
 ### Step 4 — softmax and the weighted sum of values
 
@@ -299,7 +280,7 @@ would just sit side by side, never allowed to combine their findings. `W_o`
 is what lets "head 2 found the subject and head 5 found the verb" turn into a
 single coherent representation.
 
-And here's the one gotcha that *will* bite you — **`.contiguous()`**.
+
 
 `view` can only reinterpret memory that's laid out in the standard row-major
 order. But the einsum in Step 4 produced a tensor whose *logical* axis order
@@ -309,10 +290,6 @@ sitting one after another the way `view` needs. Calling `.contiguous()`
 forces PyTorch to actually copy the data into that clean row-major layout,
 after which `view` is legal again. Skip it and you get the classic:
 
-```text
-RuntimeError: view size is not compatible with input tensor's size and
-stride ... use .reshape(...) instead
-```
 
 (You *could* use `.reshape()`, which silently does the copy for you when
 needed — but `.contiguous().view()` makes the one unavoidable copy explicit,
@@ -394,13 +371,7 @@ allowed to differ (cross-attention):
   <text x="205" y="553" text-anchor="middle" style="font-size:14px;font-weight:600;font-family:'JetBrains Mono',monospace;fill:var(--accent)">[B, Lq, d_model]</text>
 </svg>
 
-The shape leaves as `[B, L, d_model]` and comes back as `[B, Lq, d_model]` —
-same rank, ready to drop straight into the residual connection. Everything in
-between is the temporary detour into head-space and back. Once I switched to
-einsum, an entire category of "why is my tensor `[8, 32, ...]` instead of
-`[32, 8, ...]`" bugs simply evaporated: the string `b q h d, b k h d ->
-b h q k` *is* the documentation, the shape assertion, and the implementation
-all at once.
+The shape leaves as `[B, L, d_model]` and comes back as `[B, Lq, d_model]` 
 
 ## The feed-forward network
 
@@ -552,10 +523,10 @@ English sentence "which of you is relevant to me right now?" This is exactly
 where the model learns alignment — that German *Hund* should attend to
 English *dog*.
 
-## Masking: where the bugs live
+## Masking
 
-This was the part the paper made look trivial and the implementation made
-humbling. There are two different masks doing two different jobs, and both
+This was the part the paper made look trivial and the implementation proved it to be hard. 
+There are two different masks doing two different jobs, and both
 are about controlling *what a query is allowed to see*.
 
 The **source mask** hides padding. Because sentences in a batch have
@@ -594,11 +565,7 @@ columns 0…*i* and zeros after. Read as a mask, that says position *i* may
 attend to positions ≤ *i* and nothing later. That single triangular matrix is
 the entire trick behind autoregressive generation. Combined with the pad mask
 by `&`, it broadcasts to `[Batch, 1, Seq_Len, Seq_Len]` and then across all
-heads. Get this even slightly wrong — an off-by-one, a transposed triangle —
-and your training loss looks *amazing* while your model has learned nothing
-but how to read ahead, then produces garbage the moment it has to generate
-for real. It's the highest ratio of "tiny code, huge consequence" in the
-whole project.
+heads.
 
 ## Assembling the full Transformer
 
@@ -638,9 +605,7 @@ puts them on a comparable scale to the positional signal we're about to add,
 so neither drowns out the other. The paper mentions this almost in passing;
 it's easy to drop and mildly harmful to omit.
 
-(I'll flag one thing to revisit later: this `forward` returns `softmax`
-probabilities rather than raw logits. That choice ripples into the loss and
-the decoder, and it's the main thing I'd change — see the end.)
+
 
 ## The data pipeline: tokenization and batching
 
@@ -758,12 +723,6 @@ to exactly 0 doesn't become `log(0) = -inf` and blow up the loss. Then
 `reshape(-1, vocab_size)` flattens `[Batch, Seq_Len, Vocab]` down to
 `[Batch·Seq_Len, Vocab]`, and the labels flatten to a matching 1-D vector, so
 the loss is computed over every (position, correct-token) pair at once.
-
-This works, but it's the numerically clumsy path — doing `softmax` then `log`
-separately loses precision. The clean version is to return raw logits and use
-`nn.CrossEntropyLoss`, which fuses log-softmax and NLL into one numerically
-stable operation and needs no `clamp` at all. (I list this in "what I'd
-change.")
 
 ## Fitting it on one GPU
 
@@ -907,14 +866,3 @@ A few things I did the "learning" way rather than the production way:
 - **Learned positional embeddings** would be a one-line swap worth comparing
   against the fixed sinusoids.
 
-## The point of all this
-
-None of this is state of the art — that wasn't the goal. The goal was to turn
-"I've read about attention" into "I've debugged an off-by-one in a causal
-mask at midnight," and those are very different kinds of understanding.
-Reading the paper, the Transformer looks like a tidy stack of boxes. Building
-it, you learn that the boxes are the easy part and the *connective tissue* —
-the masks, the reshapes, the scaling factors, the shift between input and
-label — is where the real understanding lives. If you've only ever *used*
-Transformers, I can't recommend reimplementing one highly enough. The masks
-alone will teach you more than any diagram.

@@ -1,16 +1,16 @@
 ---
-title: "BERT from scratch: the other half of the Transformer"
+title: "BERT from scratch"
 date: 2026-07-22
 summary: Reimplementing BERT in PyTorch — the bidirectional encoder, the three summed embeddings, masked language modeling with the 80/10/10 trick, next-sentence prediction, weight tying, and pretraining it to fill in the blanks.
 tags: [NLP, BERT, PyTorch]
 ---
 
-When I [built the original Transformer](/#/posts/building-a-transformer-from-scratch),
-I built its *decoder* side — a left-to-right model that generates one token at
-a time, forbidden by a causal mask from looking ahead. BERT is the other half
-of that story: take the Transformer's **encoder**, throw away the causal mask
+When I [built the Transformer](/#/posts/building-a-transformer-from-scratch),
+I only built its *decoder* side — a left-to-right model that generates one token at
+a time, forbidden by a causal mask from looking ahead. BERT is different: 
+take the Transformer's **encoder**, throw away the causal mask
 entirely, and train it to understand text rather than generate it. This post
-is my from-scratch PyTorch reimplementation of
+is my explanation of my from-scratch PyTorch reimplementation of
 [BERT](https://arxiv.org/abs/1810.04805) — the architecture, the two
 pretraining objectives, and the small details that make masked language
 modeling actually work. Code is on
@@ -120,7 +120,7 @@ one vector:
   <text x="335" y="262" text-anchor="middle" style="font-size:11px;fill:var(--text-muted)">token identity + which sentence + where in the sequence</text>
 </svg>
 
-In code it's a literal addition of three `nn.Embedding` lookups:
+In code it's an addition of three `nn.Embedding` lookups:
 
 ```python
 embeddings = (
@@ -131,7 +131,7 @@ embeddings = (
 embeddings = self.dropout(self.LayerNorm(embeddings))
 ```
 
-Two things worth flagging against the original Transformer. First, the
+Two things that are different from the Transformer. First, the
 **position embeddings are learned** (`nn.Embedding(max_position, hidden)`),
 not the fixed sinusoids of the 2017 paper — BERT just gives each of the 512
 positions its own trainable vector. Second, there's a third stream,
@@ -143,8 +143,7 @@ to zero.
 
 ## Tokenization: WordPiece
 
-BERT tokenizes with **WordPiece**, a subword scheme close cousin to the BPE I
-used before. I train it with HuggingFace `tokenizers`, using BERT's own
+BERT tokenizes with **WordPiece**,I train it with HuggingFace `tokenizers`, using BERT's own
 normalizer (lowercasing, accent stripping) and pre-tokenizer:
 
 ```python
@@ -154,16 +153,12 @@ tok.pre_tokenizer = pre_tokenizers.BertPreTokenizer()
 trainer = trainers.WordPieceTrainer(vocab_size=vocab, special_tokens=specials)
 ```
 
-The five special tokens get the first five ids: `[PAD]`, `[UNK]`, `[CLS]`,
-`[SEP]`, `[MASK]` → `0, 1, 2, 3, 4`. Those small integers show up everywhere
-downstream, so pinning them is convenient.
 
 ## The encoder block
 
 Each of BERT's identical layers is self-attention followed by a feed-forward
-network, each wrapped in the residual-and-LayerNorm envelope. The
-self-attention is the familiar split-heads, scaled dot-product, merge-heads
-routine — with one important line for the padding mask:
+network, each wrapped in residual-and-LayerNorm ,The self-attention 
+is basically the same 
 
 ```python
 scores = torch.matmul(q, k.transpose(-1, -2)) / math.sqrt(self.head_dim)
@@ -186,7 +181,7 @@ broadcasts across heads and query positions — a real token contributes
 `(1 - 1) * min = 0`, a pad contributes `(1 - 0) * min = -inf`. Crucially,
 there is no *causal* mask here; the only thing being hidden is padding.
 
-A couple of details differ from the translation Transformer and are worth
+A couple of details differ from the Transformer and are worth
 naming:
 
 - **GELU, not ReLU.** The feed-forward network uses the smoother GELU
@@ -203,20 +198,17 @@ def forward(self, input, attn_mask=None):
     return self.LayerNorm(input + hidden_states)     # residual, then norm
 ```
 
-Stack twelve of these (six in my smaller trained config) and you have the
-encoder. Its output is one context-aware vector per token — but the model is
-still untrained. How do you teach it language with no labels? Two clever
-self-supervised objectives.
+How does BERT learn language with no labels? 
 
 ## Objective 1: Masked Language Modeling
 
 Here's the elegant solution to the "bidirectional models can't predict without
 cheating" problem: **corrupt the input**. Randomly hide 15% of the tokens and
 ask the model to reconstruct them from the surrounding context on both sides.
-It's a cloze test — "the ___ sat on the mat" — and to fill the blank the model
+"the ___ sat on the mat" — in order to fill the blank the model
 must build a genuine understanding of the whole sentence.
 
-But there's a subtlety the paper handles with a now-famous **80/10/10 rule**.
+But there's a problem the paper handles with a  **80/10/10 rule**.
 If masked tokens were always replaced with a literal `[MASK]` token, the model
 would only ever learn to reason about `[MASK]` symbols — and `[MASK]` never
 appears when you later fine-tune on real text, creating a train/test mismatch.
@@ -247,7 +239,7 @@ So of the 15% of tokens chosen for prediction:
   <text x="437" y="212" text-anchor="middle" style="font-size:11px;fill:var(--text-faint)">…but the model is scored on predicting all three</text>
 </svg>
 
-My `mask_tokens` implements exactly this, using `-100` as the label for every
+`mask_tokens` implements exactly this, using `-100` as the label for every
 *non*-selected position (PyTorch's `CrossEntropyLoss` ignores that index, so
 only the chosen 15% contribute to the loss):
 
@@ -291,7 +283,7 @@ sum:
 ```python
 loss = mlm_loss + nsp_loss
 ```
-
+This part was apparently unnecessary and only added complications, since they dropped it later when introducing RoBerta
 ## Building the training examples
 
 The dataset builder does the packing. For each anchor sentence it flips a coin:
@@ -315,9 +307,9 @@ budget, it trims tokens off whichever is longer until they fit.
 
 ## Weight tying and initialization
 
-Two small but meaningful touches in the model constructor. First, all weights
+Two things worth noting in the model constructor. First, all weights
 are initialized from a tight normal distribution (`std=0.02`, BERT's value),
-with LayerNorm gains at 1 and biases at 0. Second — and this is the neat one —
+with LayerNorm gains at 1 and biases at 0. Second — and this is the thing that suprised me  —
 the MLM output projection **shares its weight matrix** with the input word
 embeddings:
 
@@ -327,7 +319,7 @@ self.mlm_decoder.weight = self.embeddings.word_embeddings.weight
 
 This is *weight tying*: the matrix that maps a token id to a vector on the way
 in is the same one (transposed) that maps a vector back to vocabulary logits on
-the way out. It saves a huge number of parameters (the vocab projection is
+the way out. It apparently saves a huge number of parameters (the vocab projection is
 often the single biggest matrix in the model) and reflects a real symmetry
 between "what does this word mean" and "which word is this."
 
@@ -351,7 +343,7 @@ def lr_lambda(step):
 
 - **Mixed precision + gradient clipping**, exactly as before — `autocast`, a
   `GradScaler`, unscale, clip to norm 1.0, step.
-- **An efficiency trick I'm proud of.** The MLM loss only scores the ~15%
+- **An efficiency trick** The MLM loss only scores the ~15%
   masked positions, so projecting *every* token to the 8,000-word vocabulary is
   mostly wasted compute. Instead I gather only the masked hidden states first,
   then run the decoder on those:
@@ -379,9 +371,7 @@ logits, _, _ = model(torch.tensor([x], device=DEVICE))
 topk = logits[0, pos].topk(5).indices.tolist()
 ```
 
-Watching a network you wired together by hand take "the [MASK] sat on the mat"
-and rank a sensible word first is the exact moment the abstraction becomes
-real. It's a small model on a small corpus — nowhere near the real BERT's
+It's a small model trained on a small corpus — nowhere near the real BERT's
 understanding — but the mechanism is genuinely the same one that powered a
 generation of NLP.
 
@@ -414,14 +404,4 @@ generation of NLP.
   wiring up a classification head and fine-tuning on a real task would close
   the loop.
 
-## What it taught me
 
-Having built the decoder first, BERT drove home how much of "a different model"
-is really just *a different mask and a different objective* bolted onto the
-same encoder block. The attention, the residuals, the LayerNorm, the
-feed-forward network — all identical to what I'd already written. What changes
-is the *shape of what the model is allowed to see* (everything, not just the
-past) and *what you ask it to do* (reconstruct the present, not predict the
-future). Two projects in, the Transformer has stopped feeling like an
-architecture and started feeling like a **kit** — and understanding the kit is
-worth far more than memorizing any one model built from it.

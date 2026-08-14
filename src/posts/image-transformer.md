@@ -5,10 +5,7 @@ summary: A detailed walkthrough of reimplementing the Image Transformer paper in
 tags: [Image Generation, Transformer, PyTorch]
 ---
 
-After reimplementing the original Transformer for
-[translation](/#/posts/building-a-transformer-from-scratch), I wanted to see
-how far the "everything is a sequence" idea stretches. The answer, it turns
-out, is *very* far: the [Image Transformer](https://arxiv.org/abs/1802.05751)
+The [Image Transformer](https://arxiv.org/abs/1802.05751)
 (Parmar et al., 2018) treats an image as nothing more than a long sequence of
 pixel intensities and trains a decoder to predict the next one — exactly like
 a language model, except the "words" are numbers from 0 to 255.
@@ -19,7 +16,7 @@ contribution — **2D local attention** — which was by far the trickiest thing
 I've built so far. The code is on
 [GitHub](https://github.com/sadra-etaei/img-transformer).
 
-## An image is a sequence, if you squint
+## An image is a sequence
 
 A 32×32 RGB image is 32 × 32 × 3 = **3,072 numbers**, each an integer from 0
 to 255. Flatten them in *raster order* — left to right, top to bottom, the
@@ -110,14 +107,13 @@ $$
 attention scores *per head, per layer* — and with 8 heads and 12 layers
 that's roughly 900 million scores for a single 32×32 image. Double the image
 resolution and it multiplies by 16. Full attention over raw pixels simply
-doesn't scale.
+doesn't work.
 
 The Image Transformer's answer is **local attention**: each position attends
 only to a neighborhood around it rather than the whole image. The insight
 that makes this reasonable is that images are spatially coherent — a pixel's
 value is overwhelmingly determined by nearby pixels. And with 12 stacked
-layers, information still propagates across the whole image, one
-neighborhood-hop per layer — the effective receptive field grows with depth
+layers, information still propagates across the whole image — the effective receptive field grows with depth
 even though each layer is local.
 
 ## 2D local attention: query blocks and memory blocks
@@ -193,7 +189,7 @@ Q = (self.W_q(x)
      .reshape(B, n_blocks, l_q, D))       # flatten to blocks of l_q pixels
 ```
 
-### `F.unfold`: the sliding-window workhorse
+### `F.unfold`: the sliding-window 
 
 The memory blocks are harder because they **overlap** — each one extends into
 its neighbors' territory. Extracting overlapping patches by hand means messy
@@ -218,10 +214,10 @@ halo. And note the padding is asymmetric: `h_m` rows above but **zero below**,
 because in generation order the pixels below a block don't exist yet; there
 is nothing to attend to down there.
 
-### Attention with one extra letter
+### Attention
 
 After splitting heads, the einsum is the text-Transformer one with a block
-axis `n` along for the ride:
+axis `n`:
 
 ```python
 scores = torch.einsum('bnqhd,bnkhd->bnhqk', Q, K) / math.sqrt(self.d_k)
@@ -233,7 +229,7 @@ Same mental model as before — `d` contracts (dot product), `k` contracts
 (weighted sum), everything else is batched — except now `b` *and* `n` are
 carried along, so each of the `n_blocks` neighborhoods computes its attention
 independently and in parallel. This is the payoff of the blocking: what
-looks like an exotic sparse attention pattern is just dense attention with
+looks like a sparse attention pattern is just dense attention with
 one more batch dimension.
 
 Afterwards, the inverse permute/reshape puts pixels back in image order and
@@ -289,7 +285,7 @@ memory positions at or before the query. One mask matrix of shape
 `[l_q, l_m]` is shared by every block, because the geometry is identical
 everywhere — that's another gift of the uniform blocking.
 
-Two extra subtleties stack on top:
+Two extra notes:
 
 - **Image-validity masking.** The bottom/right padding pixels (and halo
   positions hanging off the image edge) are not real; a second mask, built by
@@ -380,19 +376,17 @@ def noam_lr(step, d_model, warmup):
     return d_model ** -0.5 * min(step ** -0.5, step * warmup ** -1.5)
 ```
 
-(That's why the optimizer is created with the odd-looking `lr=1.0` — the
+(That's why the optimizer is created with  `lr=1.0` — the
 schedule multiplies it every step, so the "real" learning rate lives entirely
 in `noam_lr`.) Early Transformer training is unstable while LayerNorm
-statistics settle; the warmup keeps the first few thousand steps small, and
-this schedule was one of my listed regrets from the translation project, so
-it felt good to close the loop. Checkpointing saves `last.pt` every epoch and
+statistics settle; the warmup keeps the first few thousand steps small.
+Checkpointing saves `last.pt` every epoch and
 `best.pt` whenever test bits/dim improves, with the config dict stored inside
 the checkpoint so `sample.py` can rebuild the exact architecture.
 
-## Sampling: the slow, honest way
+## Sampling:
 
-Generation is where autoregressive image models pay their bill. To sample an
-image you run the *entire model once per subpixel*, in generation order:
+To sample an image you run the *entire model once per subpixel*, in generation order:
 
 ```python
 for s in range(flat.size(1)):                    # 3,072 iterations for 32×32×3
@@ -441,14 +435,4 @@ top of my improvements list below.
   right there in the forward pass; rendering which memory pixels each query
   attends to would make a great follow-up post.
 
-## What building it taught me
 
-The translation Transformer taught me attention's *mechanics*; this project
-taught me its *geometry*. Almost every hard bug lived in the seams between
-coordinate systems — raster order vs. block order vs. generation order,
-image coordinates vs. block-relative coordinates, real pixels vs. padding.
-The model itself is the same residual rhythm as before; what's new is the
-choreography of reshapes around it, and the discipline of keeping five
-different orderings straight in your head at once. If the first project's
-lesson was "the masks will teach you," this one's is: *in two dimensions,
-everything is a mask.*

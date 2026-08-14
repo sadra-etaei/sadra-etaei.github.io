@@ -1,20 +1,16 @@
 ---
-title: "Teaching Python to write Shakespeare: RNNs and LSTMs from scratch"
+title: "char-lm : RNNs and LSTMs from scratch for language modeling"
 date: 2026-07-19
 summary: A character-level language model built with nothing but Python and NumPy — hand-written backprop through time, why vanilla RNNs fail to vanishing gradients, and how the LSTM's cell-state highway finally makes the loss go down.
 tags: [NLP, LSTM, NumPy]
 ---
 
-For my other from-scratch projects I let PyTorch handle the calculus. This
-time I wanted to understand the gradients, so I built character-level language
-models with **only Python and NumPy** — every forward pass, every
-backpropagation-through-time step, every optimizer update written by hand.
-It's a homage to Andrej Karpathy's famous
-[char-rnn](https://karpathy.github.io/2015/05/21/rnn-effectiveness/), trained
-on the same tiny-Shakespeare dataset, but with no autograd to hide behind.
 
-The project is really a story in three acts, and the plot has a genuine
-villain. The [vanilla RNN](https://github.com/sadra-etaei/char-lm) couldn't
+This project and blog post was inspired by Andrej Karpathy`s
+[char-rnn](https://karpathy.github.io/2015/05/21/rnn-effectiveness/), trained
+on the same tiny-Shakespeare dataset, but written in pure python.
+
+The [vanilla RNN](https://github.com/sadra-etaei/char-lm) couldn't
 learn. Stacking it into a deep RNN didn't help. Only after I implemented a
 multi-layer **LSTM** did the model start producing something that looks like
 English. This post is about *why* — what breaks, and what the LSTM's gates
@@ -60,7 +56,7 @@ h_t = \tanh(W_{hh}\, h_{t-1} + W_{xh}\, x_t + b_h), \qquad
 y_t = W_{hy}\, h_t + b_y
 $$
 
-The forward pass is a direct transcription — and note it stores every hidden
+The forward pass is a direct transcription — and note, it stores every hidden
 state, because backprop will need them all:
 
 ```python
@@ -108,7 +104,7 @@ param -= (lr / np.sqrt(mem + eps)) * dparam
 ## Why it failed: the vanishing gradient
 
 The vanilla RNN trained, but its loss plateaued and its samples never
-progressed past noise. The culprit is that repeated multiplication by
+progressed past noise. The main reason is the repeated multiplication by
 $W_{hh}^\top$. Chaining the recurrence backward gives a product of Jacobians:
 
 $$
@@ -121,7 +117,7 @@ the largest singular value of $W_{hh}$ is below 1, repeated multiplication
 decays geometrically. The result: gradients from far-back timesteps arrive
 essentially at zero, so the network **cannot learn long-range dependencies** —
 it never connects a closing quote to the opening one twenty characters
-earlier. (The mirror-image failure, exploding gradients when that singular
+earlier. (exploding gradients when that singular
 value exceeds 1, is the other half of the same problem.)
 
 <svg viewBox="0 0 700 260" role="img" aria-label="Unrolled RNN showing gradient vanishing backward through time" style="width:100%;height:auto;max-width:640px;display:block;margin:1.5rem auto;font-family:'Inter',sans-serif">
@@ -172,7 +168,7 @@ value exceeds 1, is the other half of the same problem.)
   <text x="350" y="30" text-anchor="middle" style="font-size:12px;fill:var(--text-muted)">each backward step multiplies by Wₕₕᵀ · tanh′ → the signal decays</text>
 </svg>
 
-## Act II — stacking didn't save it
+## Act II — stacking layers
 
 My next hypothesis was that the model just wasn't expressive enough, so I
 built an $N$-layer RNN: the hidden state of layer $l$ becomes the input to
@@ -213,12 +209,11 @@ mem += (1 - decay) * (dparam * dparam)
 param -= (lr / np.sqrt(mem + eps)) * dparam
 ```
 
-It still didn't learn. Depth adds representational power, but it does nothing
-about the fundamental problem: the gradient *through time* still passes
+The model still didn't learn.Turns out Depth adds representational power(Which I unfortunately learned a bit late ), but it does nothing about the fundamental problem: the gradient *through time* still passes
 through the same saturating tanh recurrence at every layer. More layers, same
 vanishing. The architecture itself had to change.
 
-## Act III — the LSTM, and the highway that fixes everything
+## Act III — the LSTM
 
 The Long Short-Term Memory cell solves vanishing gradients with one
 structural idea: alongside the hidden state, carry a separate **cell state**
@@ -240,7 +235,7 @@ g = np.tanh(gates[2*H:3*H])        # candidate    — the new info itself
 o = sigmoid(gates[3*H:4*H])        # output gate  — what to read out as h
 ```
 
-The three sigmoid gates output values in $(0, 1)$ — soft switches. The cell
+The three sigmoid gates output values in $(0, 1)$. The cell
 update and the new hidden state then read:
 
 $$
@@ -315,11 +310,11 @@ dc_next[l] = dc * f     # gradient to c_{t-1}: elementwise multiply by the forge
 No weight matrix, no tanh derivative — the gradient flows back through the
 cell state by an **elementwise multiply by the forget gate**. When the model
 learns to remember something, $f \approx 1$, and the gradient passes backward
-essentially untouched across hundreds of steps. This additive, un-squashed
-path is the "constant error carousel," and it's the entire reason LSTMs learn
+essentially untouched across hundreds of steps. This additive
+path is the entire reason LSTMs learn
 long-range structure where RNNs can't.
 
-I gave it a nudge in the right direction by initializing the **forget-gate
+I initialized the **forget-gate
 bias to 1**, so the cell defaults to *remembering* before it has learned when
 to forget:
 
@@ -329,9 +324,7 @@ self.b[l][0:hidden_size, 0] = 1.0   # forget gate starts "open"
 
 ### Backprop through the gates
 
-There's no autograd here either, so every gate's derivative is written out by
-hand — the payoff for understanding exactly how error splits between "back in
-time" and "down in depth":
+BPTT:
 
 ```python
 do = dh * np.tanh(c_t) * (o * (1 - o))       # sigmoid'
@@ -348,7 +341,7 @@ dh_down    = dz[self.hidden_size:]           # bottom half -> layer below
 
 Splitting `dz` back into its two halves — the top going to the previous
 hidden state, the bottom to the layer below — is the exact inverse of the
-`vstack` in the forward pass. Getting that split right is the whole game.
+`vstack` in the forward pass
 
 ## Training tricks that made it work
 
@@ -424,14 +417,4 @@ English emerge from a hand-written backward pass was genuinely thrilling.
 - **A proper train/validation split** to measure overfitting instead of eyeing
   the samples.
 
-## What building it taught me
 
-Frameworks make it far too easy to treat backprop as magic. Writing the
-backward pass of an LSTM by hand — splitting the gradient between time and
-depth, deriving each gate's local derivative, watching a single misplaced
-`np.clip` or transpose quietly poison the loss — turned "I know the LSTM
-equations" into "I know why every term is there." And the central lesson is
-one no diagram had ever really landed for me until I watched my own RNN fail
-and my own LSTM succeed on the same data: **architecture is how you shape the
-flow of gradients.** The LSTM didn't win because it was bigger. It won because
-it gave the gradient a road home.
