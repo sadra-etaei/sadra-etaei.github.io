@@ -31,6 +31,14 @@ export const projects = [
   //   year: '2026',
   // },
   {
+    title: 'mini-gpt',
+    description:
+      'a decoder-only GPT built from first principles in PyTorch, trained on TinyStories — with KV caching for O(n) generation and a full sampling suite (temperature, top-k, top-p, beam search)',
+    url: 'https://github.com/sadra-etaei/mini-gpt',
+    tags: ['LLMs', 'GPT'],
+    year: '2026',
+  },
+  {
     title: 'BERT',
     description:
       'a reimplementation of BERT',
