@@ -22,6 +22,14 @@ I mostly like building intelligence and more than that I like seeing how that in
 }
 
 export const projects = [
+  {
+    title: 'S-S finetuning',
+    description:
+      'a LoRA / rejection-sampling fine-tune of Qwen2.5-Math-1.5B on signals & systems problems, with a sympy-based verifier and a hard look at what actually moves an eval number',
+    url: 'https://github.com/sadra-etaei/S-S_finetuning',
+    tags: ['LoRA', 'fine-tuning'],
+    year: '2026',
+  },
   // {
   //   title: 'arithmetic-circuits',
   //   description:
