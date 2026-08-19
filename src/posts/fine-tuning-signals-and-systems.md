@@ -1,5 +1,5 @@
 ---
-title: "Fine-tuning a 1.5B on signals and systems : the hard part was measuring it"
+title: "Fine-tuning a 1.5B param model on signals and systems"
 date: 2026-08-18
 summary: A LoRA fine-tune of Qwen2.5-Math-1.5B on undergraduate signals and systems problems 
 tags: [LoRA, fine-tuning, evaluation]
