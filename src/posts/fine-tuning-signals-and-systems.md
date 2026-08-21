@@ -15,7 +15,7 @@ Code is on
 
 ## The setup
 
-The plan was standard rejection-sampling fine-tuning (RFT, sometimes STaR) :
+The plan was standard rejection-sampling fine-tuning:
 
 1. take problems with checkable answers,
 2. sample k solutions from the model at temperature,
@@ -66,35 +66,13 @@ The plan was standard rejection-sampling fine-tuning (RFT, sometimes STaR) :
 </figure>
 
 The model never sees a reasoning trace written by a human. It learns from its own
-successful attempts. The appeal is that you never author a single derivation —
+successful attempts. The appeal is that we never have to write a single derivation —
 but it puts the entire weight of the method on one component : **the verifier**.
 An answer becomes training data if and only if a function says it's correct.
 There's no human in the loop, no reward model, nothing else.
 
-## Why I generated the problems instead of using the textbook
 
-I had the textbook and its solutions manual as PDFs, and my first instinct was to
-extract problems from them. Both turned out to be unusable, in ways worth knowing
-before you try the same thing :
-
-**The solutions manual** is a 116-page scan. One image per page, four book pages
-per scan, skewed, no text layer at all. It's also partial cover for a 987-page
-book, and its solutions are mostly derivations and "show that" proofs rather than
-final answers a program could check.
-
-**The textbook** has an OCR text layer, but the maths is mangled. `e-5t` for
-$e^{-3t}$. `J` for the integral sign. `{3` for β. Extracted problems would need
-per-problem repair by a model, and would still be a commercial work reproduced
-into a training set.
-
-So I wrote a generator instead : 31 problem families across 8 chapters, ~5,300
-problems, where the answer is computed symbolically with sympy rather than
-written by hand. Laplace and z-transforms with regions of convergence,
-convolution, Fourier series and transforms, sampling and aliasing, LCCDEs, system
-property classification. The PDFs got used for exactly one thing — reading the
-chapter structure to check my coverage against the real syllabus.
-
-## The verifier is the load-bearing part
+## The verifier :
 
 Comparing two answers in this domain is not string matching. `\frac{1}{s+3}` and
 `(s+3)**(-1)` are the same. `Re{s} > -3` and `\text{Re}(s) > -3` are the same.
@@ -130,10 +108,9 @@ Terms containing it are split off, reduced with the sifting property
 f(t)·δ(t−a) = f(a)·δ(t−a), and matched shift by shift. A nice consequence :
 `t*DiracDelta(t)` correctly compares equal to `0`.
 
-### The gate that caught five bugs before I trained anything
 
-The single most useful thing I built was three lines long. Before writing any
-dataset, feed every problem's **own ground truth** back through the verifier,
+
+feed every problem's **own ground truth** back through the verifier,
 rendered exactly the way the prompt asks a model to render it :
 
 ```python
@@ -143,8 +120,7 @@ def roundtrip_ok(prob):
     return v.ok, v.reason
 ```
 
-If the verifier rejects the correct answer, the problem is dropped and reported.
-On the first run this caught five real bugs :
+If the verifier rejects the correct answer, the problem is dropped and reported:
 
 - infinite ROC bounds never compared equal, because `oo - oo` is `nan`, so every
   half-plane region of convergence failed;
@@ -153,15 +129,13 @@ On the first run this caught five real bugs :
   evaluated to something non-numeric;
 - three notation contracts my own parser couldn't read back.
 
-Without that gate all five would have shown up later as a mysteriously low eval
-score, and I'd have blamed the model.
 
 The mirror-image test matters just as much. Round-tripping only proves the
 verifier accepts correct answers — a verifier hardcoded to `return True` passes
 it. So the test suite also **corrupts** every family's ground truth (sign flip,
 off-by-one, dropped factor) and asserts rejection.
 
-## Measurement bug #1 : 12.5 points of "capability" that was a token budget
+## Measurement bug #1 :
 
 First baseline : **39.0%**. Squarely in the "green" band I'd pre-registered, so I
 almost moved straight on to training.
@@ -266,7 +240,7 @@ Then I split the problems by how often they were solved :
 |---|---|---|
 | solved 4/4 | 27.5% | already reliable — **nothing to teach** |
 | solved 0/4 | 37.6% | unreachable — **no trace can ever be harvested** |
-| solved 1–3/4 | 34.9% | **the only band RFT can act on** |
+| solved 1–3/4 | 34.9% | **the only band rejection-sampling can act on** |
 
 <figure style="margin:1.75rem 0">
 <svg viewBox="0 0 700 250" role="img" aria-label="Of the k=4 outcomes per problem, only the 1-3 correct band is useful for rejection-sampling fine-tuning; solved-0 is unreachable and solved-4 has nothing to teach" style="width:100%;height:auto;max-width:640px;display:block;margin:0 auto;font-family:'Inter',sans-serif">
@@ -765,8 +739,8 @@ any k, and that's the ceiling self-sampling can't touch. Generating traces for
 those with a larger model, filtered through the same verifier, is the one lever
 that breaks it instead of working inside it.
 
-**Ablate the v2 changes.** Band filter, hard-weighting, and epoch count moved
-together. I don't actually know the split.
+
+**Try STAR** 
 
 **Fix the `lti` regression.** It contributed the most traces (366) and was the
 only topic that went backwards. That's a thread worth pulling.
@@ -776,6 +750,6 @@ batching would cut that by an order of magnitude, and at batch 24 I was already
 getting 6.8× over batch 2 just from batching properly — autoregressive decoding
 is memory-bandwidth-bound, so a small batch wastes almost the whole GPU.
 
-**A bigger prose eval.** At n=272 the 95% interval is still ±5.9 points.
+**A bigger eval.** 
 
 
